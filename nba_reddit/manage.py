@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
+import praw
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nba_reddit.settings")

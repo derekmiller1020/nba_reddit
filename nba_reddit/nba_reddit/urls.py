@@ -11,4 +11,6 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^threads/', 'live_stream.views.retrieve_threads', name="retrieve_threads"),
     url(r'^comments/', 'live_stream.views.retrieve_comments', name="retrieve_comments"),
+    url(r'^redirect_url', 'live_stream.views.redirect_url', name="redirect_url"),
+    url(r'^submit_comment', 'live_stream.views.submit_comment', name="submit_comment"),
 )
