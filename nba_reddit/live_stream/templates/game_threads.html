@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+{% for threads in game_threads %}
+<a href="http://127.0.0.1:8000/comments?id={{ threads }}">{% for text in the_text %} {{ text }} {% endfor %}</a>
+{% endfor %}
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+{% for comment in the_comments reversed %}
+    <br> <b>{{comment.author}}:</b> {{ comment }}<br>
+{% endfor %}
+</body>
+</html>
