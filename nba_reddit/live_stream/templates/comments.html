@@ -1,11 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-</head>
-<body>
-{% for comment in the_comments reversed %}
-    <br> <b>{{comment.author}}:</b> {{ comment }}<br>
+{% extends "base.html" %}
+{% block content %}
+
+{% if can_comment != "correct" %}
+    <br><a href="{{link}}">Click here to comment or sign into Reddit</a><br>
+{% elif can_comment = "correct" %}
+    <textarea id = "woo"></textarea>
+{% endif %}
+
+{% for comment in the_comments %}
+    <br> <b>({{comment.score}}) {{comment.author}}:</b> {{ comment }}<br>
+        &nbsp &nbsp &nbsp &nbsp {{comment.reply}}
 {% endfor %}
-</body>
-</html>
+
+{% endblock %}
