@@ -1,10 +1,12 @@
 from django.shortcuts import render
 import praw
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, StreamingHttpResponse, HttpResponse
 from models import InsertCommentForm
 from django.template import loader, Context, RequestContext
 import webbrowser
 from variables import *
+import json
+import requests
 
 #Global usage laziness to set the OAUTH
 r.set_oauth_app_info(CLIENT_ID, SECRET_ID, REDIRECT_URI)
@@ -52,6 +54,7 @@ def retrieve_comments(request):
 
     else:
         #GET OUT OF HERE!
+        threads = ""
         return HttpResponseRedirect('/threads/')
 
     return render(request, 'comments.html', {
@@ -59,6 +62,7 @@ def retrieve_comments(request):
         'username': username,
         'can_comment': can_comment,
         'link': link_no_refresh,
+        'threads': threads,
     })
 
 
@@ -76,3 +80,27 @@ def redirect_url(request):
         request.session['code'] = id
 
     return HttpResponseRedirect('/threads/')
+
+
+def retrieve(request):
+
+    if request.method == "POST":
+        thread = request.POST.get('id')
+        url = 'http://www.reddit.com/r/nba/comments/%s/.json?sort=new' % thread
+        get_data = requests.get(url)
+        dict_it = json.loads(get_data.text)
+
+        c = dict_it[1]['data']['children']
+        full_data = []
+
+        for item in c:
+            x = item['data']
+            if 'body' in x:
+                full_data.append({'author': x['author'], 'body': x['body']})
+
+        full_json = json.dumps(full_data)
+
+    else:
+        full_json = "Sorry, nothing to see here"
+
+    return HttpResponse(full_json, content_type="application/json")

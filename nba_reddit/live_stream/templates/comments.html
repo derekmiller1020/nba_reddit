@@ -1,15 +1,60 @@
 {% extends "base.html" %}
 {% block content %}
 
+<style>
+    #comment {
+        border: 3px solid #ccc;
+        height: 400px;
+        overflow-y: auto;
+        padding: 10px;
+    }
+</style>
+
+<div class="row">
+    <div class = "box_container">
+        <div class="col-md-11 col-md-offset-3">
+            <div id = "comment" class="box_container">
+
+            </div>
+        </div>
+    </div>
+</div>
+
 {% if can_comment != "correct" %}
     <br><a href="{{link}}">Click here to comment or sign into Reddit</a><br>
 {% elif can_comment = "correct" %}
     <textarea id = "woo"></textarea>
 {% endif %}
 
-{% for comment in the_comments %}
-    <br> <b>({{comment.score}}) {{comment.author}}:</b> {{ comment }}<br>
-        &nbsp &nbsp &nbsp &nbsp {{comment.reply}}
-{% endfor %}
+<script type = "text/javascript">
+var reddit = {}
 
+reddit.retrieveData = function(){
+    $.ajax({
+	    type : "POST",
+		url : "/retrieve/",
+        data: {
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+            'id': '{{threads}}'
+        },
+		error : function () {
+			console.log("if you can see this, Let someone know that there was an error");
+		},
+		success : function(data) {
+            var something = data.reverse();
+            var si = [];
+            for (var i=0; i<something.length; i++){
+                var responses = something[i];
+                si.push("<br><b>" + responses["author"] + ":</b> " + responses["body"] + "<br>" );
+                //$("#test").html("<br><h4>" + responses["author"] + ":</h4> " + responses["body"] + "<br>" );
+            }
+            $("#comment").html(si);
+		}
+	});
+}
+
+reddit.interval = setInterval(reddit.retrieveData, 6000);
+reddit.retrieveData();
+
+</script>
 {% endblock %}
