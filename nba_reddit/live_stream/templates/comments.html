@@ -8,6 +8,9 @@
         overflow-y: auto;
         padding: 10px;
     }
+    #reponses {
+        background-color: #b0c4de;
+    }
 </style>
 
 <div class="row">
@@ -27,9 +30,8 @@
 {% endif %}
 
 <script type = "text/javascript">
-var reddit = {}
 
-reddit.retrieveData = function(){
+(function poll(){
     $.ajax({
 	    type : "POST",
 		url : "/retrieve/",
@@ -45,16 +47,16 @@ reddit.retrieveData = function(){
             var si = [];
             for (var i=0; i<something.length; i++){
                 var responses = something[i];
-                si.push("<br><b>" + responses["author"] + ":</b> " + responses["body"] + "<br>" );
-                //$("#test").html("<br><h4>" + responses["author"] + ":</h4> " + responses["body"] + "<br>" );
+                si.push("<br><b>" + responses["author"] + ":</b><br><div id='responses'>"
+                    + responses["body"] + "</div><br>" );
             }
             $("#comment").html(si);
-		}
+		},
+		complete: poll,
+		timeout: 30000
 	});
-}
+})();
 
-reddit.interval = setInterval(reddit.retrieveData, 6000);
-reddit.retrieveData();
 
 </script>
 {% endblock %}

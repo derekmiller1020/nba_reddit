@@ -5,16 +5,15 @@ from models import InsertCommentForm
 from django.template import loader, Context, RequestContext
 import webbrowser
 from variables import *
-import json
-import requests
+from the_long_poll import the_long_poll
 
-#Global usage laziness to set the OAUTH
+#Oauth global
 r.set_oauth_app_info(CLIENT_ID, SECRET_ID, REDIRECT_URI)
 
 def retrieve_threads(request):
 
     #check the r/nba submissions
-    submissions = r.get_subreddit('nba').get_new(limit=50)
+    submissions = r.get_subreddit('nba').get_new(limit=200)
 
     #append game_threads(too much logic for a comprehension)
     game_threads = []
@@ -51,10 +50,9 @@ def retrieve_comments(request):
         submission = r.get_submission(submission_id=threads, comment_sort="new")
         the_comments = submission.comments
 
-
     else:
+
         #GET OUT OF HERE!
-        threads = ""
         return HttpResponseRedirect('/threads/')
 
     return render(request, 'comments.html', {
@@ -81,26 +79,17 @@ def redirect_url(request):
 
     return HttpResponseRedirect('/threads/')
 
-
+#I didn't feel like setting up a websocket app for this app. ajax polling it is. It is really bad practice, I know.
+#also, I didn't like how praw was retrieving data, so I am parsing the api directly.
 def retrieve(request):
 
+    #ajax is requesting a post
     if request.method == "POST":
         thread = request.POST.get('id')
-        url = 'http://www.reddit.com/r/nba/comments/%s/.json?sort=new' % thread
-        get_data = requests.get(url)
-        dict_it = json.loads(get_data.text)
+        the_inst = the_long_poll(thread)
+        full_json = the_inst.the_post()
 
-        c = dict_it[1]['data']['children']
-        full_data = []
-
-        for item in c:
-            x = item['data']
-            if 'body' in x:
-                full_data.append({'author': x['author'], 'body': x['body']})
-
-        full_json = json.dumps(full_data)
+        return HttpResponse(full_json, content_type="application/json")
 
     else:
-        full_json = "Sorry, nothing to see here"
-
-    return HttpResponse(full_json, content_type="application/json")
+        return HttpResponseRedirect("/threads/")
