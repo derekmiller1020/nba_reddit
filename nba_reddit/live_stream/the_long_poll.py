@@ -15,9 +15,10 @@ class the_long_poll(object):
         #use this datetime to disregard reddit cache
         the_date = datetime.datetime.now()
 
+        headers = {'user-agent': 'R_NBA_COMMENT_Stream from /u/bobdammit.'}
         #get the id in the ajax post to populate the url
         url = 'http://www.reddit.com/r/nba/comments/%s/.json?%s&sort=new' % (self.thread, the_date)
-        get_data = requests.get(url)
+        get_data = requests.get(url, headers=headers)
 
         if get_data.status_code != 200:
             time.sleep(3)

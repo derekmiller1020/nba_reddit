@@ -31,15 +31,22 @@ def retrieve_threads(request):
 
 def retrieve_comments(request):
 
-    #Is the user logged in and accepted me stealing all of their info??
+    #Is the user logged in and has accepted me stealing all of their info??
     #JK!
     if r.is_oauth_session():
         get_em = r.get_me()
+
+        #show my username
         username = get_em.name
+
+        #A variable that is going to be used as a boolean.. huh?
         can_comment = "correct"
+
         link_no_refresh = ""
 
     else:
+
+        #set an oauth link where users can sign in to reddit
         link_no_refresh = r.get_authorize_url('uniqueKey', 'identity', True)
         username = ""
         can_comment = ""
@@ -74,8 +81,6 @@ def redirect_url(request):
 
         #set that puppy
         r.set_access_credentials(**access_information)
-        id = request.GET['code']
-        request.session['code'] = id
 
     return HttpResponseRedirect('/threads/')
 
