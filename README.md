@@ -1,4 +1,6 @@
 nba_reddit
 ==========
 
-This project will likely never finish, due to a lack of time, and the fact that I will need to build a library to stream comments from Reddit. Since Reddit caches page requests, I am unable to live stream comments from just reddit's api.
+This is a comment stream for r/nba
+
+At the time of writing this, this project is nowhere near finished. I am writing a redis queue at the moment to be a wrapper for the reddit api. 429 status codes are all over the place, although I am sending one request every 3 seconds.
