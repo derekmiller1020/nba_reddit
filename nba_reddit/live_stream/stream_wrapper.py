@@ -37,7 +37,7 @@ class StreamWrapper(object):
         #if the status != 200, Reddit probably thinks we are sending too many requests
         if get_data.status_code != 200:
             time.sleep(5)
-            self.the_post()
+            return "connection error with reddit"
 
         else:
 
@@ -56,7 +56,6 @@ class StreamWrapper(object):
                 self.the_post()
 
             else:
-
                 #append some stuff
                 for item in c:
                     x = item['data']
@@ -72,11 +71,6 @@ class StreamWrapper(object):
                         )
                         #Redis, set a new body variable
                         the_redis.set('body', the_test)
-
-                    else:
-                        #something wonky happened. sleep and try again.
-                        time.sleep(3)
-                        self.the_post()
 
             full_json = json.dumps(full_data)
 
