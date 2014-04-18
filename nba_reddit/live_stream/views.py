@@ -5,7 +5,7 @@ from models import InsertCommentForm
 from django.template import loader, Context, RequestContext
 import webbrowser
 from variables import *
-from the_long_poll import the_long_poll
+from stream_wrapper import StreamWrapper
 
 #Oauth global
 r.set_oauth_app_info(CLIENT_ID, SECRET_ID, REDIRECT_URI)
@@ -54,8 +54,6 @@ def retrieve_comments(request):
     #if and 'id' is specified in request.GET, do these things
     if 'id' in request.GET:
         threads = request.GET['id']
-        submission = r.get_submission(submission_id=threads, comment_sort="new")
-        the_comments = submission.comments
 
     else:
 
@@ -63,7 +61,6 @@ def retrieve_comments(request):
         return HttpResponseRedirect('/threads/')
 
     return render(request, 'comments.html', {
-        'the_comments': the_comments,
         'username': username,
         'can_comment': can_comment,
         'link': link_no_refresh,
@@ -84,17 +81,18 @@ def redirect_url(request):
 
     return HttpResponseRedirect('/threads/')
 
-#I didn't feel like setting up a websocket app for this app. ajax polling it is. It is really bad practice, I know.
-#also, I didn't like how praw was retrieving data, so I am parsing the api directly.
+#I didn't feel like setting up a websocket app for this app. ajax polling it is. It isn't the best these day.
+#also, I didn't like how praw was retrieving data, so built a small api wrapper.
 def retrieve(request):
 
     #ajax is requesting a post
     if request.method == "POST":
         thread = request.POST.get('id')
-        the_inst = the_long_poll(thread)
+        the_inst = StreamWrapper(thread)
         full_json = the_inst.the_post()
 
         return HttpResponse(full_json, content_type="application/json")
 
     else:
+
         return HttpResponseRedirect("/threads/")
