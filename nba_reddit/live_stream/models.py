@@ -10,4 +10,7 @@ class InsertCommentForm(ModelForm):
 
     class Meta:
         model = InsertComment
+        widgets = {
+            'comment': forms.Textarea(attrs={'style': "width: 350px", 'rows': 3, }),
+        }
         fields = ['comment']

@@ -13,4 +13,6 @@ urlpatterns = patterns('',
     url(r'^comments/', 'live_stream.views.retrieve_comments', name="retrieve_comments"),
     url(r'^redirect_url', 'live_stream.views.redirect_url', name="redirect_url"),
     url(r'^retrieve', 'live_stream.views.retrieve', name="retrieve"),
+    url(r'^submit', 'live_stream.views.send_comment', name="send_comment"),
+
 )

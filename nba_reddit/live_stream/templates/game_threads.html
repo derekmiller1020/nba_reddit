@@ -2,7 +2,7 @@
 {% block content %}
 
 {% for threads in game_threads %}
-<h4><a href="http://127.0.0.1:8000/comments?id={{ threads.id }}">{{ threads }}</a></h4><br><br>
+<h4><a href="http://127.0.0.1:8000/comments?name={{ threads }}&id={{ threads.id }}">{{ threads }}</a></h4><br><br>
 {% endfor %}
 
 {% endblock %}

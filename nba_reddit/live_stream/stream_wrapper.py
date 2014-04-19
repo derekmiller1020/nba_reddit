@@ -8,16 +8,10 @@ class StreamWrapper(object):
 
     def __init__(self, thread):
 
-        #thread id
         self.thread = thread
-
-        #credentials
         self.credentials = {'user': username, 'passwd': password, 'api_type': 'json', }
-
-        #send user_agent
         self.headers = {'user-agent': user_agent, }
 
-        #request session method
         self.session_client = requests.session()
 
         #login
@@ -30,6 +24,9 @@ class StreamWrapper(object):
     #recurse function for streaming comments
     def the_post(self):
 
+        #set the create timestamp for cache purposes
+        the_redis.set('connect_timestamp', datetime.datetime.now())
+
         #get the id in the ajax post to populate the url
         url = 'http://www.reddit.com/r/nba/comments/%s/.json?sort=new&limit=50' % self.thread
         get_data = self.session_client.get(url, headers=self.headers)
@@ -41,6 +38,7 @@ class StreamWrapper(object):
 
         else:
 
+            time.sleep(3)
             #Load that data into a dictionary
             dict_it = json.loads(get_data.text)
 
@@ -48,14 +46,13 @@ class StreamWrapper(object):
             c = dict_it[1]['data']['children']
             the_test = c[0]['data']['body']
 
-            full_data = []
-
             #If the comment stream has not updated. Start the recursion!
             if the_redis.get('body') == the_test:
                 time.sleep(3)
                 self.the_post()
 
             else:
+                full_data = []
                 #append some stuff
                 for item in c:
                     x = item['data']
@@ -66,13 +63,15 @@ class StreamWrapper(object):
                                 'author': x['author'],
                                 'body': x['body'],
                                 'ups': x['ups'],
-                                'downs': x['downs']
+                                'downs': x['downs'],
+                                'team': x['author_flair_css_class']
                             }
                         )
+
                         #Redis, set a new body variable
                         the_redis.set('body', the_test)
 
-            full_json = json.dumps(full_data)
+                full_json = json.dumps(full_data)
 
-            #congrats request! You made it!
-            return full_json
+                #congrats request! You made it!
+                return full_json

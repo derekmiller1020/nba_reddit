@@ -9,31 +9,47 @@
         padding: 10px;
     }
     #responses {
-        background-color: #b0c4de;
+        background-color: #B0C4DE;
     }
 </style>
 
 <div class="row">
     <div class = "col-md-10 col-md-offset-2">
-        <H1>Comments</H1><br>
+        <H1>{{ name }}</H1><br> {{ woo }}
     </div>
     <div class = "box_container">
         <div class="col-md-11 col-md-offset-3">
             <div id = "comment" class="box_container">
-
+                <h3>LOADING MESSAGES</h3>
             </div>
         </div>
     </div>
 </div>
 
 {% if can_comment != "correct" %}
-    <br><a href="{{link}}">Click here to comment or sign into Reddit</a><br>
+    <div class = "box_container">
+        <div class="col-md-11 col-md-offset-4">
+            <br><br>
+            <a href="{{link}}">Click here to comment or sign into Reddit</a><br>
+        </div>
+        <br><br>
+    </div>
 {% elif can_comment = "correct" %}
-    <textarea id = "woo"></textarea>
+
+    <div class = "box_container">
+        <br><br>
+        <div class="col-md-11 col-md-offset-4">
+                {{ message.as_p }}
+                <div class="col-md-11 col-md-offset-7">
+                    <button type="button" id="submit" class="btn btn-success">Submit</button>
+                    <br><br><br>
+                </div>
+        </div>
+    </div>
 {% endif %}
 
 <script type = "text/javascript">
-
+$( document ).ready(function() {
 (function poll(){
     $.ajax({
 	    type : "POST",
@@ -50,16 +66,40 @@
             var si = [];
             for (var i=0; i<something.length; i++){
                 var responses = something[i];
-                si.push("<br><b>" + responses["author"] + ":</b><br><div id='responses'>"
+                number = responses["ups"] - responses["downs"];
+                si.push("[" + number + "]<b>  " + responses["author"] + ":</b>  [" + responses['team'] + "]" +
+                    "<br><div id='responses'>"
                     + responses["body"] + "</div><br>" );
             }
             $("#comment").html(si);
 		},
 		complete: poll,
-		timeout: 30000
+		timeout: 45000
 	});
 })();
+});
 
+$( "#submit" ).click(function( event ) {
+    comment = $("#id_comment").val();
+    $.ajax({
+	    type : "POST",
+		url : "/submit/",
+        data: {
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+            'id': '{{threads}}',
+            'comment': comment
+        },
+		error : function () {
+			console.log("if you can see this, Let someone know that there was an error");
+		},
+		success : function(data) {
+		    alert(data);
+		},
+
+	});
+
+
+})
 
 </script>
 {% endblock %}
